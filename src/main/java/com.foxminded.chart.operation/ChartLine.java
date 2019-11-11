@@ -4,13 +4,18 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class ChartLine {
+public class ChartLine implements Comparable<ChartLine> {
     private String abbreviation;
     private String name;
     private String team;
     private Date startTime;
     private Date endTime;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss.SSS");
+
+    public ChartLine(String name, String team) {
+        this.setName(name);
+        this.setTeam(team);
+    }
 
     public void setAbbreviation(String abbreviation) {
         this.abbreviation = abbreviation;
@@ -32,6 +37,14 @@ public class ChartLine {
         this.endTime = dateFormat.parse(endTime);
     }
 
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
     public String toString() {
         char SEPARATOR = '|';
         SimpleDateFormat timeFormat = new SimpleDateFormat("m:ss.SSS");
@@ -40,7 +53,15 @@ public class ChartLine {
                 .append(SEPARATOR)
                 .append(String.format("%-27s", team))
                 .append(SEPARATOR)
-                .append(timeFormat.format(endTime.getTime() - startTime.getTime()))
+                //.append(timeFormat.format(endTime.getTime() - startTime.getTime()))
+                .append(startTime)
+                .append(endTime)
                 .toString();
+    }
+
+    @Override
+    public int compareTo(ChartLine line) {
+        return Long.compare(this.getEndTime().getTime() - this.getStartTime().getTime(),
+                line.getEndTime().getTime() - line.getStartTime().getTime());
     }
 }
