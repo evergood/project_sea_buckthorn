@@ -5,11 +5,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ChartLine {
+    private String abbreviation;
     private String name;
     private String team;
     private Date startTime;
     private Date endTime;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss.SSS");
+
+    public void setAbbreviation(String abbreviation) {
+        this.abbreviation = abbreviation;
+    }
 
     public void setName(String name) {
         this.name = name;
@@ -26,7 +31,6 @@ public class ChartLine {
     public void setEndTime(String endTime) throws ParseException {
         this.endTime = dateFormat.parse(endTime);
     }
-
 
     public String toString() {
         char SEPARATOR = '|';
