@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ChartLine implements Comparable<ChartLine> {
-    private String abbreviation;
     private String name;
     private String team;
     private Date startTime;
@@ -15,10 +14,6 @@ public class ChartLine implements Comparable<ChartLine> {
     public ChartLine(String name, String team) {
         this.setName(name);
         this.setTeam(team);
-    }
-
-    public void setAbbreviation(String abbreviation) {
-        this.abbreviation = abbreviation;
     }
 
     public void setName(String name) {
@@ -53,9 +48,7 @@ public class ChartLine implements Comparable<ChartLine> {
                 .append(SEPARATOR)
                 .append(String.format("%-27s", team))
                 .append(SEPARATOR)
-                //.append(timeFormat.format(endTime.getTime() - startTime.getTime()))
-                .append(startTime)
-                .append(endTime)
+                .append(timeFormat.format(endTime.getTime() - startTime.getTime()))
                 .toString();
     }
 
