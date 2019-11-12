@@ -23,7 +23,7 @@ public class ChartCombiner {
     public String outputChart() throws IOException {
         int counter = 1;
         StringBuilder output = new StringBuilder();
-        for (Map.Entry<String, ChartLine> entry : sortChart(combineChart(chart)).entrySet()) {
+        for (Map.Entry<String, ChartLine> entry : sortChart(combineChart()).entrySet()) {
             output.append(String.format("%-23s", new StringBuilder()
                     .append(counter)
                     .append('.')
@@ -50,22 +50,21 @@ public class ChartCombiner {
                         e1, LinkedHashMap::new));
     }
 
-    public Map<String, ChartLine> combineChart(Map<String, ChartLine> chart) throws IOException {
+    private Map<String, ChartLine> combineChart() throws IOException {
         getAbbreviationData(this.chart);
         getStartData(this.chart);
         getEndData(this.chart);
         return this.chart;
     }
 
-    private Map<String, ChartLine> getAbbreviationData(Map<String, ChartLine> chart) throws IOException {
+    private void getAbbreviationData(Map<String, ChartLine> chart) throws IOException {
         try (Stream<String> lines = Files.lines(Paths.get(ABBREVIATION_PATH))) {
             lines.forEach((p) ->
                     chart.put(p.split(LOW_LINE)[0], new ChartLine(p.split(LOW_LINE)[1], p.split(LOW_LINE)[2])));
         }
-        return chart;
     }
 
-    private Map<String, ChartLine> getStartData(Map<String, ChartLine> chart) throws IOException {
+    private void getStartData(Map<String, ChartLine> chart) throws IOException {
         try (Stream<String> lines = Files.lines(Paths.get(START_PATH))) {
             lines.forEach((p) -> {
                 try {
@@ -75,10 +74,9 @@ public class ChartCombiner {
                 }
             });
         }
-        return chart;
     }
 
-    private Map<String, ChartLine> getEndData(Map<String, ChartLine> chart) throws IOException {
+    private void getEndData(Map<String, ChartLine> chart) throws IOException {
         try (Stream<String> lines = Files.lines(Paths.get(END_PATH))) {
             lines.forEach((p) -> {
                 try {
@@ -88,7 +86,6 @@ public class ChartCombiner {
                 }
             });
         }
-        return chart;
     }
 }
 
