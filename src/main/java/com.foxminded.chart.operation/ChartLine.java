@@ -9,7 +9,8 @@ public class ChartLine implements Comparable<ChartLine> {
     private String team;
     private Date startTime;
     private Date endTime;
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss.SSS");
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss.SSS");
+    private static SimpleDateFormat timeFormat = new SimpleDateFormat("m:ss.SSS");
 
     public ChartLine(String name, String team) {
         this.setName(name);
@@ -32,6 +33,14 @@ public class ChartLine implements Comparable<ChartLine> {
         this.endTime = dateFormat.parse(endTime);
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getTeam() {
+        return team;
+    }
+
     public Date getStartTime() {
         return startTime;
     }
@@ -40,16 +49,8 @@ public class ChartLine implements Comparable<ChartLine> {
         return endTime;
     }
 
-    public String toString() {
-        char SEPARATOR = '|';
-        SimpleDateFormat timeFormat = new SimpleDateFormat("m:ss.SSS");
-        return new StringBuilder()
-                .append(String.format("%-20s", name))
-                .append(SEPARATOR)
-                .append(String.format("%-27s", team))
-                .append(SEPARATOR)
-                .append(timeFormat.format(endTime.getTime() - startTime.getTime()))
-                .toString();
+    String getLapTime() {
+        return timeFormat.format(endTime.getTime() - startTime.getTime());
     }
 
     @Override
@@ -57,4 +58,6 @@ public class ChartLine implements Comparable<ChartLine> {
         return Long.compare(this.getEndTime().getTime() - this.getStartTime().getTime(),
                 line.getEndTime().getTime() - line.getStartTime().getTime());
     }
+
+
 }
