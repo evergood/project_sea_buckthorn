@@ -7,38 +7,41 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ChartCombiner {
+    private static final Logger logger = Logger.getLogger(ChartCombiner.class.getName());
     private static final String LOW_LINE = "_";
     private static final String LINE = "|";
     private static final String SEPARATOR = "____________________________________________________________";
-    private static final String ABBREVIATION_PATH = "src/main/files/abbreviations.txt";
-    private static final String START_PATH = "src/main/files/start.log";
-    private static final String END_PATH = "src/main/files/end.log";
 
     private Map<String, ChartLine> chart = new HashMap<>();
 
-    public String outputChart() throws IOException {
-        int counter = 1;
+    public String outputChart(String filenameAbbrevation,
+                              String filenameStart, String filenameEnd) throws IOException {
+        AtomicInteger counter = new AtomicInteger(1);
         StringBuilder output = new StringBuilder();
-        for (Map.Entry<String, ChartLine> entry : sortChart(combineChart()).entrySet()) {
+        sortChart(combineChart(filenameAbbrevation, filenameStart, filenameEnd)).forEach((key, value) -> {
             output.append(String.format("%-23s", new StringBuilder()
-                    .append(counter)
+                    .append(counter.get())
                     .append('.')
-                    .append(entry.getValue()
+                    .append(value
                             .getName())))
                     .append(LINE)
-                    .append(String.format("%-27s", entry.getValue().getTeam()))
+                    .append(String.format("%-27s", value.getTeam()))
                     .append(LINE)
-                    .append(entry.getValue().getLapTime())
+                    .append(value.getLapTime())
                     .append("\n");
-            counter++;
-            if (counter == 16) {
+            counter.getAndIncrement();
+            if (counter.get() == 16) {
                 output.append(SEPARATOR).append("\n");
             }
-        }
+        });
+
         return output.toString().trim();
     }
 
@@ -50,39 +53,40 @@ public class ChartCombiner {
                         e1, LinkedHashMap::new));
     }
 
-    private Map<String, ChartLine> combineChart() throws IOException {
-        getAbbreviationData(this.chart);
-        getStartData(this.chart);
-        getEndData(this.chart);
+    private Map<String, ChartLine> combineChart(String filenameAbbrevation,
+                                                String filenameStart, String filenameEnd) throws IOException {
+        getAbbreviationData(this.chart, filenameAbbrevation);
+        getStartData(this.chart, filenameStart);
+        getEndData(this.chart, filenameEnd);
         return this.chart;
     }
 
-    private void getAbbreviationData(Map<String, ChartLine> chart) throws IOException {
-        try (Stream<String> lines = Files.lines(Paths.get(ABBREVIATION_PATH))) {
+    private void getAbbreviationData(Map<String, ChartLine> chart, String path) throws IOException {
+        try (Stream<String> lines = Files.lines(Paths.get(path))) {
             lines.forEach((p) ->
                     chart.put(p.split(LOW_LINE)[0], new ChartLine(p.split(LOW_LINE)[1], p.split(LOW_LINE)[2])));
         }
     }
 
-    private void getStartData(Map<String, ChartLine> chart) throws IOException {
-        try (Stream<String> lines = Files.lines(Paths.get(START_PATH))) {
+    private void getStartData(Map<String, ChartLine> chart, String path) throws IOException {
+        try (Stream<String> lines = Files.lines(Paths.get(path))) {
             lines.forEach((p) -> {
                 try {
-                    chart.get(p.substring(0, 3)).setStartTime(p.substring(4));
+                    chart.get(p.substring(0, 3)).setStartTime(p.substring(3));
                 } catch (ParseException e) {
-                    e.printStackTrace();
+                    logger.log(Level.WARNING, e.getMessage());
                 }
             });
         }
     }
 
-    private void getEndData(Map<String, ChartLine> chart) throws IOException {
-        try (Stream<String> lines = Files.lines(Paths.get(END_PATH))) {
+    private void getEndData(Map<String, ChartLine> chart, String path) throws IOException {
+        try (Stream<String> lines = Files.lines(Paths.get(path))) {
             lines.forEach((p) -> {
                 try {
-                    chart.get(p.substring(0, 3)).setEndTime(p.substring(4));
+                    chart.get(p.substring(0, 3)).setEndTime(p.substring(3));
                 } catch (ParseException e) {
-                    e.printStackTrace();
+                    logger.log(Level.WARNING, e.getMessage());
                 }
             });
         }

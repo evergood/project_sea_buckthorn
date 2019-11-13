@@ -1,16 +1,19 @@
 package com.foxminded.chart.operation;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class ChartLine implements Comparable<ChartLine> {
     private String name;
     private String team;
-    private Date startTime;
-    private Date endTime;
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss.SSS");
-    private static SimpleDateFormat timeFormat = new SimpleDateFormat("m:ss.SSS");
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss.SSS");
+    private static final DateFormat TIME_FORMAT = new SimpleDateFormat("m:ss.SSS");
 
     public ChartLine(String name, String team) {
         this.setName(name);
@@ -26,11 +29,11 @@ public class ChartLine implements Comparable<ChartLine> {
     }
 
     public void setStartTime(String startTime) throws ParseException {
-        this.startTime = dateFormat.parse(startTime);
+        this.startTime = LocalDateTime.parse(startTime, DATE_FORMAT);
     }
 
     public void setEndTime(String endTime) throws ParseException {
-        this.endTime = dateFormat.parse(endTime);
+        this.endTime = LocalDateTime.parse(endTime, DATE_FORMAT);
     }
 
     public String getName() {
@@ -41,22 +44,22 @@ public class ChartLine implements Comparable<ChartLine> {
         return team;
     }
 
-    public Date getStartTime() {
+    public LocalDateTime getStartTime() {
         return startTime;
     }
 
-    public Date getEndTime() {
+    public LocalDateTime getEndTime() {
         return endTime;
     }
 
     String getLapTime() {
-        return timeFormat.format(endTime.getTime() - startTime.getTime());
+        return TIME_FORMAT.format(Duration.between(this.getStartTime(), this.getEndTime()).toMillis());
     }
 
     @Override
     public int compareTo(ChartLine line) {
-        return Long.compare(this.getEndTime().getTime() - this.getStartTime().getTime(),
-                line.getEndTime().getTime() - line.getStartTime().getTime());
+        return Long.compare(Duration.between(this.getEndTime(), this.getStartTime()).toMillis(),
+                Duration.between(line.getEndTime(), line.getEndTime()).toMillis());
     }
 
 

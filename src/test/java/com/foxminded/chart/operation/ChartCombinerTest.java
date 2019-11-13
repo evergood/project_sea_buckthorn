@@ -30,6 +30,7 @@ public class ChartCombinerTest {
                         "17.Marcus Ericsson     |SAUBER FERRARI             |1:13.265\n" +
                         "18.Lance Stroll        |WILLIAMS MERCEDES          |1:13.323\n" +
                         "19.Kevin Magnussen     |HAAS FERRARI               |1:13.393";
-        assertEquals(expected, combiner.outputChart());
+        assertEquals(expected, combiner.outputChart("src/main/resources/abbreviations.txt",
+                "src/main/resources/start.log", "src/main/resources/end.log"));
     }
 }
