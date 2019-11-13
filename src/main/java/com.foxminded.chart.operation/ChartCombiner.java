@@ -39,7 +39,7 @@ public class ChartCombiner {
                 output.append(SEPARATOR).append("\n");
             }
         }
-        return output.toString();
+        return output.toString().trim();
     }
 
     private Map<String, ChartLine> sortChart(Map<String, ChartLine> chart) {
