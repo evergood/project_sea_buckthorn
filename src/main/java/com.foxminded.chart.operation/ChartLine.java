@@ -58,8 +58,8 @@ public class ChartLine implements Comparable<ChartLine> {
 
     @Override
     public int compareTo(ChartLine line) {
-        return Long.compare(Duration.between(this.getEndTime(), this.getStartTime()).toMillis(),
-                Duration.between(line.getEndTime(), line.getEndTime()).toMillis());
+        return Long.compare(Duration.between(line.getEndTime(), line.getStartTime()).toMillis(),
+                Duration.between(this.getEndTime(), this.getStartTime()).toMillis());
     }
 
 

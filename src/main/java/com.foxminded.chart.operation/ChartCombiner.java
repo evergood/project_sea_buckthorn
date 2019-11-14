@@ -1,11 +1,13 @@
 package com.foxminded.chart.operation;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
@@ -15,14 +17,13 @@ import java.util.stream.Stream;
 
 public class ChartCombiner {
     private static final Logger logger = Logger.getLogger(ChartCombiner.class.getName());
+
     private static final String LOW_LINE = "_";
     private static final String LINE = "|";
     private static final String SEPARATOR = "____________________________________________________________";
 
-    private Map<String, ChartLine> chart = new HashMap<>();
-
     public String outputChart(String filenameAbbrevation,
-                              String filenameStart, String filenameEnd) throws IOException {
+                              String filenameStart, String filenameEnd) {
         AtomicInteger counter = new AtomicInteger(1);
         StringBuilder output = new StringBuilder();
         sortChart(combineChart(filenameAbbrevation, filenameStart, filenameEnd)).forEach((key, value) -> {
@@ -45,6 +46,13 @@ public class ChartCombiner {
         return output.toString().trim();
     }
 
+    private void validate(String filenameAbbrevation,
+                          String filenameStart, String filenameEnd) {
+        if (filenameAbbrevation == null || filenameStart == null || filenameEnd == null) {
+            throw new IllegalArgumentException("")
+        }
+    }
+
     private Map<String, ChartLine> sortChart(Map<String, ChartLine> chart) {
         return chart.entrySet()
                 .stream()
@@ -54,11 +62,20 @@ public class ChartCombiner {
     }
 
     private Map<String, ChartLine> combineChart(String filenameAbbrevation,
-                                                String filenameStart, String filenameEnd) throws IOException {
-        getAbbreviationData(this.chart, filenameAbbrevation);
-        getStartData(this.chart, filenameStart);
-        getEndData(this.chart, filenameEnd);
-        return this.chart;
+                                                String filenameStart, String filenameEnd) {
+        Map<String, ChartLine> chart = new HashMap<>();
+        getAbbreviationData(chart, filenameAbbrevation);
+        getStartData(chart, filenameStart);
+        getEndData(chart, filenameEnd);
+        return chart;
+    }
+
+    private List<String> readFile (String path) {
+        try (Stream<String> lines = Files.lines(Paths.get(path))) {
+
+        } catch (UncheckedIOException | IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void getAbbreviationData(Map<String, ChartLine> chart, String path) throws IOException {
