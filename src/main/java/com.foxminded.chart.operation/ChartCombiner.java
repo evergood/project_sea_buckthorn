@@ -1,22 +1,19 @@
 package com.foxminded.chart.operation;
 
+import com.sun.org.slf4j.internal.Logger;
+import com.sun.org.slf4j.internal.LoggerFactory;
+
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.ParseException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ChartCombiner {
-    private static final Logger logger = Logger.getLogger(ChartCombiner.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChartCombiner.class);
 
     private static final String LOW_LINE = "_";
     private static final String LINE = "|";
@@ -24,6 +21,7 @@ public class ChartCombiner {
 
     public String outputChart(String filenameAbbrevation,
                               String filenameStart, String filenameEnd) {
+        validate(filenameAbbrevation, filenameStart, filenameEnd);
         AtomicInteger counter = new AtomicInteger(1);
         StringBuilder output = new StringBuilder();
         sortChart(combineChart(filenameAbbrevation, filenameStart, filenameEnd)).forEach((key, value) -> {
@@ -48,8 +46,14 @@ public class ChartCombiner {
 
     private void validate(String filenameAbbrevation,
                           String filenameStart, String filenameEnd) {
-        if (filenameAbbrevation == null || filenameStart == null || filenameEnd == null) {
-            throw new IllegalArgumentException("")
+        if (filenameAbbrevation == null) {
+            throw new IllegalArgumentException("Abbreviation file is null");
+        }
+        if (filenameStart == null) {
+            throw new IllegalArgumentException("Start log is null");
+        }
+        if (filenameEnd == null) {
+            throw new IllegalArgumentException("End log is null");
         }
     }
 
@@ -70,43 +74,37 @@ public class ChartCombiner {
         return chart;
     }
 
-    private List<String> readFile (String path) {
+    private List<String> readFromFile(String path) {
         try (Stream<String> lines = Files.lines(Paths.get(path))) {
-
-        } catch (UncheckedIOException | IOException e) {
-            e.printStackTrace();
+            return lines.collect(Collectors.toCollection(LinkedList::new));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private void getAbbreviationData(Map<String, ChartLine> chart, String path) throws IOException {
-        try (Stream<String> lines = Files.lines(Paths.get(path))) {
-            lines.forEach((p) ->
-                    chart.put(p.split(LOW_LINE)[0], new ChartLine(p.split(LOW_LINE)[1], p.split(LOW_LINE)[2])));
-        }
+    private void getAbbreviationData(Map<String, ChartLine> chart, String path) {
+        readFromFile(path).forEach((p) ->
+                chart.put(p.split(LOW_LINE)[0], new ChartLine(p.split(LOW_LINE)[1], p.split(LOW_LINE)[2])));
     }
 
-    private void getStartData(Map<String, ChartLine> chart, String path) throws IOException {
-        try (Stream<String> lines = Files.lines(Paths.get(path))) {
-            lines.forEach((p) -> {
-                try {
-                    chart.get(p.substring(0, 3)).setStartTime(p.substring(3));
-                } catch (ParseException e) {
-                    logger.log(Level.WARNING, e.getMessage());
-                }
-            });
-        }
+    private void getStartData(Map<String, ChartLine> chart, String path) {
+        readFromFile(path).forEach((p) -> {
+            try {
+                chart.get(p.substring(0, 3)).setStartTime(p.substring(3));
+            } catch (ParseException e) {
+                LOGGER.warn(e.getMessage());
+            }
+        });
     }
 
-    private void getEndData(Map<String, ChartLine> chart, String path) throws IOException {
-        try (Stream<String> lines = Files.lines(Paths.get(path))) {
-            lines.forEach((p) -> {
-                try {
-                    chart.get(p.substring(0, 3)).setEndTime(p.substring(3));
-                } catch (ParseException e) {
-                    logger.log(Level.WARNING, e.getMessage());
-                }
-            });
-        }
+    private void getEndData(Map<String, ChartLine> chart, String path) {
+        readFromFile(path).forEach((p) -> {
+            try {
+                chart.get(p.substring(0, 3)).setEndTime(p.substring(3));
+            } catch (ParseException e) {
+                LOGGER.warn(e.getMessage());
+            }
+        });
     }
 }
 

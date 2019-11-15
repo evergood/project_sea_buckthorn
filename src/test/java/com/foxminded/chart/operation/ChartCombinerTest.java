@@ -1,14 +1,36 @@
 package com.foxminded.chart.operation;
 
 import org.junit.jupiter.api.Test;
-import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ChartCombinerTest {
     private final ChartCombiner combiner = new ChartCombiner();
 
     @Test
-    void chartCombinerShouldReturnCorrectChart() throws IOException {
+    void chartCombinerShouldThrowExceptionIfAbbreviationFileIsNull() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () ->
+                combiner.outputChart(null, "some_name", "some_name"));
+        assertEquals("Abbreviation file is null", exception.getMessage());
+    }
+
+    @Test
+    void chartCombinerShouldThrowExceptionIfStartLogIsNull() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () ->
+                combiner.outputChart("some_name", null, "some_name"));
+        assertEquals("Start log is null", exception.getMessage());
+    }
+
+    @Test
+    void chartCombinerShouldThrowExceptionIfEndLogIsNull() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () ->
+                combiner.outputChart("some_name", "some_name", null));
+        assertEquals("End log is null", exception.getMessage());
+    }
+
+    @Test
+    void chartCombinerShouldReturnCorrectChart() {
         final String expected =
                 "1.Sebastian Vettel     |FERRARI                    |1:04.415\n" +
                         "2.Daniel Ricciardo     |RED BULL RACING TAG HEUER  |1:12.013\n" +
