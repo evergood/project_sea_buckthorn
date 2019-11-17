@@ -9,24 +9,17 @@ public class ChartCombinerTest {
     private final ChartCombiner combiner = new ChartCombiner();
 
     @Test
-    void chartCombinerShouldThrowExceptionIfAbbreviationFileIsNull() {
+    void chartCombinerShouldThrowExceptionIfFilenameIsNull() {
         Throwable exception = assertThrows(IllegalArgumentException.class, () ->
                 combiner.outputChart(null, "some_name", "some_name"));
-        assertEquals("Abbreviation file is null", exception.getMessage());
+        assertEquals("Path to file abbreviations.txt is null or empty", exception.getMessage());
     }
 
     @Test
-    void chartCombinerShouldThrowExceptionIfStartLogIsNull() {
+    void chartCombinerShouldThrowExceptionIfFilenameIsEmpty() {
         Throwable exception = assertThrows(IllegalArgumentException.class, () ->
-                combiner.outputChart("some_name", null, "some_name"));
-        assertEquals("Start log is null", exception.getMessage());
-    }
-
-    @Test
-    void chartCombinerShouldThrowExceptionIfEndLogIsNull() {
-        Throwable exception = assertThrows(IllegalArgumentException.class, () ->
-                combiner.outputChart("some_name", "some_name", null));
-        assertEquals("End log is null", exception.getMessage());
+                combiner.outputChart("", "some_name", "some_name"));
+        assertEquals("Path to file abbreviations.txt is null or empty", exception.getMessage());
     }
 
     @Test

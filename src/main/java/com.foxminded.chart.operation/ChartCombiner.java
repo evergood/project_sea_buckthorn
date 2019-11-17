@@ -1,7 +1,7 @@
 package com.foxminded.chart.operation;
 
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,7 +21,9 @@ public class ChartCombiner {
 
     public String outputChart(String filenameAbbrevation,
                               String filenameStart, String filenameEnd) {
-        validate(filenameAbbrevation, filenameStart, filenameEnd);
+        validate(filenameAbbrevation, "abbreviations.txt");
+        validate(filenameStart, "start.log");
+        validate(filenameEnd, "end.log");
         AtomicInteger counter = new AtomicInteger(1);
         StringBuilder output = new StringBuilder();
         sortChart(combineChart(filenameAbbrevation, filenameStart, filenameEnd)).forEach((key, value) -> {
@@ -44,16 +46,11 @@ public class ChartCombiner {
         return output.toString().trim();
     }
 
-    private void validate(String filenameAbbrevation,
-                          String filenameStart, String filenameEnd) {
-        if (filenameAbbrevation == null) {
-            throw new IllegalArgumentException("Abbreviation file is null");
-        }
-        if (filenameStart == null) {
-            throw new IllegalArgumentException("Start log is null");
-        }
-        if (filenameEnd == null) {
-            throw new IllegalArgumentException("End log is null");
+    private static void validate(String filename, String variableName) {
+        if (filename == null || filename.isEmpty()) {
+            String message = String.format("Path to file %s is null or empty", variableName);
+            LOGGER.error(message);
+            throw new IllegalArgumentException(message);
         }
     }
 
@@ -76,15 +73,16 @@ public class ChartCombiner {
 
     private List<String> readFromFile(String path) {
         try (Stream<String> lines = Files.lines(Paths.get(path))) {
-            return lines.collect(Collectors.toCollection(LinkedList::new));
+            return lines.collect(Collectors.toCollection(ArrayList::new));
         } catch (IOException e) {
+            LOGGER.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }
 
-    private void getAbbreviationData(Map<String, ChartLine> chart, String path) {
-        readFromFile(path).forEach((p) ->
-                chart.put(p.split(LOW_LINE)[0], new ChartLine(p.split(LOW_LINE)[1], p.split(LOW_LINE)[2])));
+    private Map<String, String> getAbbreviationData(String path) {
+        return readFromFile(path).stream().collect(Collectors.toMap((p) -> p.substring(0, 4), (p) -> p.substring(4)));
+                //chart.put(p.split(LOW_LINE)[0], new ChartLine(p.split(LOW_LINE)[1], p.split(LOW_LINE)[2])));
     }
 
     private void getStartData(Map<String, ChartLine> chart, String path) {
