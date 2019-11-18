@@ -65,9 +65,22 @@ public class ChartCombiner {
     private Map<String, ChartLine> combineChart(String filenameAbbrevation,
                                                 String filenameStart, String filenameEnd) {
         Map<String, ChartLine> chart = new HashMap<>();
-        getAbbreviationData(chart, filenameAbbrevation);
-        getStartData(chart, filenameStart);
-        getEndData(chart, filenameEnd);
+        getData(filenameAbbrevation).forEach((k, v) -> chart.put(k, new ChartLine(v.split("_")[0], v.split("_")[1])));
+        getData(filenameStart).forEach((k, v) -> {
+            try {
+                chart.get(k).setStartTime(v);
+            } catch (ParseException e) {
+                LOGGER.warn(e.getMessage());
+            }
+        });
+        getData(filenameEnd).forEach((k, v) -> {
+            try {
+                chart.get(k).setEndTime(v);
+            } catch (ParseException e) {
+                LOGGER.warn(e.getMessage());
+            }
+        });
+
         return chart;
     }
 
@@ -80,9 +93,8 @@ public class ChartCombiner {
         }
     }
 
-    private Map<String, String> getAbbreviationData(String path) {
+    private Map<String, String> getData(String path) {
         return readFromFile(path).stream().collect(Collectors.toMap((p) -> p.substring(0, 4), (p) -> p.substring(4)));
-                //chart.put(p.split(LOW_LINE)[0], new ChartLine(p.split(LOW_LINE)[1], p.split(LOW_LINE)[2])));
     }
 
     private void getStartData(Map<String, ChartLine> chart, String path) {
