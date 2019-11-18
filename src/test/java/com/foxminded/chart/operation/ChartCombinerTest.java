@@ -11,19 +11,30 @@ public class ChartCombinerTest {
     @Test
     void chartCombinerShouldThrowExceptionIfFilenameIsNull() {
         Throwable exception = assertThrows(IllegalArgumentException.class, () ->
-                combiner.outputChart(null, "some_name", "some_name"));
+                combiner.outputChart(null, "src/test/resources/start.log",
+                        "src/test/resources/end.log"));
         assertEquals("Path to file abbreviations.txt is null or empty", exception.getMessage());
     }
 
     @Test
     void chartCombinerShouldThrowExceptionIfFilenameIsEmpty() {
         Throwable exception = assertThrows(IllegalArgumentException.class, () ->
-                combiner.outputChart("", "some_name", "some_name"));
+                combiner.outputChart("", "src/test/resources/start.log",
+                        "src/test/resources/end.log"));
         assertEquals("Path to file abbreviations.txt is null or empty", exception.getMessage());
     }
 
     @Test
-    void chartCombinerShouldReturnCorrectChart() {
+    void chartCombinerShouldThrowExceptionIfFileIsEmpty() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () ->
+                combiner.outputChart("src/test/resources/abbreviations_empty.txt",
+                        "src/test/resources/start.log",
+                        "src/test/resources/end.log"));
+        assertEquals("File abbreviations.txt is empty", exception.getMessage());
+    }
+
+    @Test
+    void chartCombinerShouldReturnCorrectChartForNineteenPerson() {
         final String expected =
                 "1.Sebastian Vettel     |FERRARI                    |1:04.415\n" +
                         "2.Daniel Ricciardo     |RED BULL RACING TAG HEUER  |1:12.013\n" +
@@ -45,7 +56,33 @@ public class ChartCombinerTest {
                         "17.Marcus Ericsson     |SAUBER FERRARI             |1:13.265\n" +
                         "18.Lance Stroll        |WILLIAMS MERCEDES          |1:13.323\n" +
                         "19.Kevin Magnussen     |HAAS FERRARI               |1:13.393";
-        assertEquals(expected, combiner.outputChart("src/main/resources/abbreviations.txt",
-                "src/main/resources/start.log", "src/main/resources/end.log"));
+        assertEquals(expected, combiner.outputChart("src/test/resources/abbreviations.txt",
+                "src/test/resources/start.log", "src/test/resources/end.log"));
     }
+
+    @Test
+    void chartCombinerShouldReturnCorrectChartForOnePerson() {
+        final String expected = "1.Daniel Ricciardo     |RED BULL RACING TAG HEUER  |1:12.013";
+        assertEquals(expected, combiner.outputChart("src/test/resources/abbreviations_one_person.txt",
+                "src/test/resources/start_one_person.log",
+                "src/test/resources/end_one_person.log"));
+    }
+
+    @Test
+    void chartCombinerShouldReturnCorrectChartForTenPerson() {
+        final String expected = "1.Sebastian Vettel     |FERRARI                    |1:04.415\n" +
+                "2.Daniel Ricciardo     |RED BULL RACING TAG HEUER  |1:12.013\n" +
+                "3.Valtteri Bottas      |MERCEDES                   |1:12.434\n" +
+                "4.Lewis Hamilton       |MERCEDES                   |1:12.460\n" +
+                "5.Kimi Raikkonen       |FERRARI                    |1:12.639\n" +
+                "6.Fernando Alonso      |MCLAREN RENAULT            |1:12.657\n" +
+                "7.Sergio Perez         |FORCE INDIA MERCEDES       |1:12.848\n" +
+                "8.Pierre Gasly         |SCUDERIA TORO ROSSO HONDA  |1:12.941\n" +
+                "9.Carlos Sainz         |RENAULT                    |1:12.950\n" +
+                "10.Esteban Ocon        |FORCE INDIA MERCEDES       |1:13.028";
+        assertEquals(expected, combiner.outputChart("src/test/resources/abbreviations_ten_person.txt",
+                "src/test/resources/start_ten_person.log",
+                "src/test/resources/end_ten_person.log"));
+    }
+
 }

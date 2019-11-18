@@ -47,11 +47,18 @@ public class ChartCombiner {
     }
 
     private static void validate(String filename, String variableName) {
+        String message;
         if (filename == null || filename.isEmpty()) {
-            String message = String.format("Path to file %s is null or empty", variableName);
-            LOGGER.error(message);
-            throw new IllegalArgumentException(message);
+            message = String.format("Path to file %s is null or empty", variableName);
+        } else {
+            if (Paths.get(filename).toFile().length() == 0) {
+                message = String.format("File %s is empty", variableName);
+            } else {
+                return;
+            }
         }
+        LOGGER.error(message);
+        throw new IllegalArgumentException(message);
     }
 
     private Map<String, ChartLine> sortChart(Map<String, ChartLine> chart) {
@@ -65,7 +72,8 @@ public class ChartCombiner {
     private Map<String, ChartLine> combineChart(String filenameAbbrevation,
                                                 String filenameStart, String filenameEnd) {
         Map<String, ChartLine> chart = new HashMap<>();
-        getData(filenameAbbrevation).forEach((k, v) -> chart.put(k, new ChartLine(v.split("_")[0], v.split("_")[1])));
+        getData(filenameAbbrevation).forEach((k, v) ->
+                chart.put(k, new ChartLine(v.split(LOW_LINE)[1], v.split(LOW_LINE)[2])));
         getData(filenameStart).forEach((k, v) -> {
             try {
                 chart.get(k).setStartTime(v);
@@ -94,27 +102,7 @@ public class ChartCombiner {
     }
 
     private Map<String, String> getData(String path) {
-        return readFromFile(path).stream().collect(Collectors.toMap((p) -> p.substring(0, 4), (p) -> p.substring(4)));
-    }
-
-    private void getStartData(Map<String, ChartLine> chart, String path) {
-        readFromFile(path).forEach((p) -> {
-            try {
-                chart.get(p.substring(0, 3)).setStartTime(p.substring(3));
-            } catch (ParseException e) {
-                LOGGER.warn(e.getMessage());
-            }
-        });
-    }
-
-    private void getEndData(Map<String, ChartLine> chart, String path) {
-        readFromFile(path).forEach((p) -> {
-            try {
-                chart.get(p.substring(0, 3)).setEndTime(p.substring(3));
-            } catch (ParseException e) {
-                LOGGER.warn(e.getMessage());
-            }
-        });
+        return readFromFile(path).stream().collect(Collectors.toMap((p) -> p.substring(0, 3), (p) -> p.substring(3)));
     }
 }
 

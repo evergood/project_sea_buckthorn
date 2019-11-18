@@ -39,6 +39,7 @@ public class ChartLine implements Comparable<ChartLine> {
     String getLapTime() {
         return TIME_FORMAT.format(Duration.between(this.getStartTime(), this.getEndTime()).toMillis());
     }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -54,7 +55,6 @@ public class ChartLine implements Comparable<ChartLine> {
     public void setEndTime(String endTime) throws ParseException {
         this.endTime = LocalDateTime.parse(endTime, DATE_FORMAT);
     }
-
 
 
     @Override
