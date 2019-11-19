@@ -1,23 +1,23 @@
 package com.foxminded.chart.operation;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
-public class ChartLine {
-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss.SSS");
-    private static final DateFormat TIME_FORMAT = new SimpleDateFormat("m:ss.SSS");
+public class ChartLine implements Comparable<ChartLine> {
     private String name;
-    private String team;
+    private String teamName;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
-    public ChartLine(String name, String team) {
-        this.setName(name);
-        this.setTeam(team);
+    public ChartLine(String name, String teamName, LocalDateTime startTime, LocalDateTime endTime) {
+        this.name = name;
+        this.teamName = teamName;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+
+    public ChartLine() {
+
     }
 
     public String getName() {
@@ -25,7 +25,7 @@ public class ChartLine {
     }
 
     public String getTeam() {
-        return team;
+        return teamName;
     }
 
     public LocalDateTime getStartTime() {
@@ -36,30 +36,25 @@ public class ChartLine {
         return endTime;
     }
 
-    String getLapTime() {
-        return TIME_FORMAT.format(Duration.between(this.getStartTime(), this.getEndTime()).toMillis());
-    }
-
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setTeam(String team) {
-        this.team = team;
+    public void setTeamName(String team) {
+        this.teamName = team;
     }
 
-    public void setStartTime(String startTime) throws ParseException {
-        this.startTime = LocalDateTime.parse(startTime, DATE_FORMAT);
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
     }
 
-    public void setEndTime(String endTime) throws ParseException {
-        this.endTime = LocalDateTime.parse(endTime, DATE_FORMAT);
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
-
 
     @Override
     public int compareTo(ChartLine line) {
-        return Long.compare(Duration.between(line.getEndTime(), line.getStartTime()).toMillis(),
-                Duration.between(this.getEndTime(), this.getStartTime()).toMillis());
+        return Duration.between(line.getEndTime(), line.getStartTime()).
+                compareTo(Duration.between(this.getEndTime(), this.getStartTime()));
     }
 }
