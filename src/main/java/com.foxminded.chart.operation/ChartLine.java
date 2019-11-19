@@ -7,7 +7,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class ChartLine implements Comparable<ChartLine> {
+public class ChartLine {
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss.SSS");
     private static final DateFormat TIME_FORMAT = new SimpleDateFormat("m:ss.SSS");
     private String name;

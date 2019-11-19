@@ -15,26 +15,31 @@ import java.util.stream.Stream;
 public class ChartCombiner {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChartCombiner.class);
 
-    private static final String LOW_LINE = "_";
-    private static final String LINE = "|";
+    private static final String UNDERSCORE = "_";
+    private static final String VERTICAL_BAR = "|";
     private static final String SEPARATOR = "____________________________________________________________";
 
-    public String outputChart(String filenameAbbrevation,
+    public String outputChart(String filenameAbbreviation,
                               String filenameStart, String filenameEnd) {
-        validate(filenameAbbrevation, "abbreviations.txt");
+        validate(filenameAbbreviation, "abbreviations.txt");
         validate(filenameStart, "start.log");
         validate(filenameEnd, "end.log");
+
+        return formOutputData(sortChart(combineChart(filenameAbbreviation, filenameStart, filenameEnd)));
+    }
+
+    private String formOutputData (Map<String, ChartLine> chart) {
         AtomicInteger counter = new AtomicInteger(1);
         StringBuilder output = new StringBuilder();
-        sortChart(combineChart(filenameAbbrevation, filenameStart, filenameEnd)).forEach((key, value) -> {
+        chart.forEach((key, value) -> {
             output.append(String.format("%-23s", new StringBuilder()
                     .append(counter.get())
                     .append('.')
                     .append(value
                             .getName())))
-                    .append(LINE)
+                    .append(VERTICAL_BAR)
                     .append(String.format("%-27s", value.getTeam()))
-                    .append(LINE)
+                    .append(VERTICAL_BAR)
                     .append(value.getLapTime())
                     .append("\n");
             counter.getAndIncrement();
@@ -73,7 +78,7 @@ public class ChartCombiner {
                                                 String filenameStart, String filenameEnd) {
         Map<String, ChartLine> chart = new HashMap<>();
         getData(filenameAbbrevation).forEach((k, v) ->
-                chart.put(k, new ChartLine(v.split(LOW_LINE)[1], v.split(LOW_LINE)[2])));
+                chart.put(k, new ChartLine(v.split(UNDERSCORE)[1], v.split(UNDERSCORE)[2])));
         getData(filenameStart).forEach((k, v) -> {
             try {
                 chart.get(k).setStartTime(v);
@@ -94,7 +99,7 @@ public class ChartCombiner {
 
     private List<String> readFromFile(String path) {
         try (Stream<String> lines = Files.lines(Paths.get(path))) {
-            return lines.collect(Collectors.toCollection(ArrayList::new));
+            return lines.collect(Collectors.toList());
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
             throw new RuntimeException(e);
