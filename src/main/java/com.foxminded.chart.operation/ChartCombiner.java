@@ -58,14 +58,14 @@ public class ChartCombiner {
         if (filename == null || filename.isEmpty()) {
             String message = String.format("Path to file [%s] is null or empty", variableName);
             LOGGER.error(message);
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(message);
         }
         final File file = Paths.get(filename).toFile();
 
         if (!file.exists()) {
             String message = String.format("File [%s] does not exist at specified path", variableName);
             LOGGER.error(message);
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(message);
         }
 
         if (file.length() == 0) {
