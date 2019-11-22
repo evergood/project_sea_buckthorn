@@ -83,8 +83,8 @@ public class ChartCombiner {
         }
     }
 
-    private Map<String, ChartLine> sortChart(Map<String, ChartLine> chart) {
-        return chart.entrySet()
+    private Map<String, ChartLine> sortChart(Map<String, ChartLine> abbreviationToChartLine) {
+        return abbreviationToChartLine.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByValue())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) ->
@@ -97,7 +97,6 @@ public class ChartCombiner {
         final Map<String, String> abbreviationToNames = extractDataTextFromFile(filenameAbbrevation);
         final Map<String, LocalDateTime> abbreviationToStartTime = extractDataTimeFromFile(filenameStart);
         final Map<String, LocalDateTime> abbreviationToEndTime = extractDataTimeFromFile(filenameEnd);
-
 
         Map<String, ChartLine> abbreviationToChartLine = new HashMap<>();
         abbreviationToNames.forEach((k, v) -> {
