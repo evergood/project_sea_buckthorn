@@ -4,20 +4,16 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class ChartLine implements Comparable<ChartLine> {
-    private String name;
-    private String teamName;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private final String name;
+    private final String teamName;
+    private final LocalDateTime startTime;
+    private final LocalDateTime endTime;
 
-    public ChartLine(String name, String teamName, LocalDateTime startTime, LocalDateTime endTime) {
-        this.name = name;
-        this.teamName = teamName;
-        this.startTime = startTime;
-        this.endTime = endTime;
-    }
-
-    public ChartLine() {
-
+    private ChartLine(Builder builder) {
+        this.name = builder.name;
+        this.teamName = builder.teamName;
+        this.startTime = builder.startTime;
+        this.endTime = builder.endTime;
     }
 
     public String getName() {
@@ -36,25 +32,44 @@ public class ChartLine implements Comparable<ChartLine> {
         return endTime;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setTeamName(String team) {
-        this.teamName = team;
-    }
-
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
-    }
-
     @Override
     public int compareTo(ChartLine line) {
         return Duration.between(line.getEndTime(), line.getStartTime()).
                 compareTo(Duration.between(this.getEndTime(), this.getStartTime()));
+    }
+
+    public static class Builder {
+        private String name;
+        private String teamName;
+        private LocalDateTime startTime;
+        private LocalDateTime endTime;
+
+        public Builder() {
+
+        }
+
+        public ChartLine build() {
+            return new ChartLine(this);
+        }
+
+        public Builder withName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder withTeamName(String teamName) {
+            this.teamName = teamName;
+            return this;
+        }
+
+        public Builder withStartTime(LocalDateTime startTime) {
+            this.startTime = startTime;
+            return this;
+        }
+
+        public Builder withEndTime(LocalDateTime endTime) {
+            this.endTime = endTime;
+            return this;
+        }
     }
 }

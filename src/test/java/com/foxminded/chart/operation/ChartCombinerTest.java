@@ -2,6 +2,11 @@ package com.foxminded.chart.operation;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -33,7 +38,7 @@ class ChartCombinerTest {
     }
 
     @Test
-    void chartCombinerShouldThrowExceptionIfFilenameIsEmpty() {
+    void chartCombinerShouldThrowExceptionIfAbbreviationFilenameIsEmpty() {
         Throwable exception = assertThrows(IllegalArgumentException.class, () ->
                 combiner.outputChart("", "src/test/resources/start.log",
                         "src/test/resources/end.log"));
@@ -41,88 +46,86 @@ class ChartCombinerTest {
     }
 
     @Test
-    void chartCombinerShouldThrowExceptionIfFileIsEmpty() {
+    void chartCombinerShouldThrowExceptionIfStartFilenameIsEmpty() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () ->
+                combiner.outputChart("src/test/resources/abbreviations.txt", "",
+                        "src/test/resources/end.log"));
+        assertEquals("Path to file [start.log] is null or empty", exception.getMessage());
+    }
+
+    @Test
+    void chartCombinerShouldThrowExceptionIfEndFilenameIsEmpty() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () ->
+                combiner.outputChart("src/test/resources/abbreviations.txt",
+                        "src/test/resources/start.log", ""));
+        assertEquals("Path to file [end.log] is null or empty", exception.getMessage());
+    }
+
+    @Test
+    void chartCombinerShouldThrowExceptionIfAbbreviationFileIsEmpty() {
         Throwable exception = assertThrows(EmptyFileException.class, () ->
-                combiner.outputChart("src/test/resources/abbreviations_empty.txt",
+                combiner.outputChart("src/test/resources/empty/abbreviations.txt",
                         "src/test/resources/start.log",
                         "src/test/resources/end.log"));
         assertEquals("File [abbreviations.txt] is empty", exception.getMessage());
     }
 
     @Test
-    void chartCombinerShouldReturnCorrectChartForNineteenPerson() throws EmptyFileException {
-        final String expected =
-                "1.Sebastian Vettel     |FERRARI                    |1:04.415\n" +
-                        "2.Daniel Ricciardo     |RED BULL RACING TAG HEUER  |1:12.013\n" +
-                        "3.Valtteri Bottas      |MERCEDES                   |1:12.434\n" +
-                        "4.Lewis Hamilton       |MERCEDES                   |1:12.460\n" +
-                        "5.Stoffel Vandoorne    |MCLAREN RENAULT            |1:12.463\n" +
-                        "6.Kimi Raikkonen       |FERRARI                    |1:12.639\n" +
-                        "7.Fernando Alonso      |MCLAREN RENAULT            |1:12.657\n" +
-                        "8.Sergey Sirotkin      |WILLIAMS MERCEDES          |1:12.706\n" +
-                        "9.Charles Leclerc      |SAUBER FERRARI             |1:12.829\n" +
-                        "10.Sergio Perez        |FORCE INDIA MERCEDES       |1:12.848\n" +
-                        "11.Romain Grosjean     |HAAS FERRARI               |1:12.930\n" +
-                        "12.Pierre Gasly        |SCUDERIA TORO ROSSO HONDA  |1:12.941\n" +
-                        "13.Carlos Sainz        |RENAULT                    |1:12.950\n" +
-                        "14.Esteban Ocon        |FORCE INDIA MERCEDES       |1:13.028\n" +
-                        "15.Nico Hulkenberg     |RENAULT                    |1:13.065\n" +
-                        "____________________________________________________________\n" +
-                        "16.Brendon Hartley     |SCUDERIA TORO ROSSO HONDA  |1:13.179\n" +
-                        "17.Marcus Ericsson     |SAUBER FERRARI             |1:13.265\n" +
-                        "18.Lance Stroll        |WILLIAMS MERCEDES          |1:13.323\n" +
-                        "19.Kevin Magnussen     |HAAS FERRARI               |1:13.393";
-        assertEquals(expected, combiner.outputChart("src/test/resources/abbreviations.txt",
-                "src/test/resources/start.log", "src/test/resources/end.log"));
+    void chartCombinerShouldThrowExceptionIfStartFileIsEmpty() {
+        Throwable exception = assertThrows(EmptyFileException.class, () ->
+                combiner.outputChart("src/test/resources/abbreviations.txt",
+                        "src/test/resources/empty/start.log",
+                        "src/test/resources/end.log"));
+        //assertEquals("File [start.log] is empty", exception.getMessage());
     }
 
     @Test
-    void chartCombinerShouldReturnCorrectChartForOnePerson() throws EmptyFileException {
-        final String expected = "1.Daniel Ricciardo     |RED BULL RACING TAG HEUER  |1:12.013";
-        assertEquals(expected, combiner.outputChart("src/test/resources/abbreviations_one_person.txt",
-                "src/test/resources/start_one_person.log",
-                "src/test/resources/end_one_person.log"));
+    void chartCombinerShouldThrowExceptionIfENdFileIsEmpty() {
+        Throwable exception = assertThrows(EmptyFileException.class, () ->
+                combiner.outputChart("src/test/resources/abbreviations.txt",
+                        "src/test/resources/start.log",
+                        "src/test/resources/empty/end.log"));
+        assertEquals("File [end.log] is empty", exception.getMessage());
     }
 
     @Test
-    void chartCombinerShouldReturnCorrectChartForTenPerson() throws EmptyFileException {
-        final String expected = "1.Sebastian Vettel     |FERRARI                    |1:04.415\n" +
-                "2.Daniel Ricciardo     |RED BULL RACING TAG HEUER  |1:12.013\n" +
-                "3.Valtteri Bottas      |MERCEDES                   |1:12.434\n" +
-                "4.Lewis Hamilton       |MERCEDES                   |1:12.460\n" +
-                "5.Kimi Raikkonen       |FERRARI                    |1:12.639\n" +
-                "6.Fernando Alonso      |MCLAREN RENAULT            |1:12.657\n" +
-                "7.Sergio Perez         |FORCE INDIA MERCEDES       |1:12.848\n" +
-                "8.Pierre Gasly         |SCUDERIA TORO ROSSO HONDA  |1:12.941\n" +
-                "9.Carlos Sainz         |RENAULT                    |1:12.950\n" +
-                "10.Esteban Ocon        |FORCE INDIA MERCEDES       |1:13.028";
-        assertEquals(expected, combiner.outputChart("src/test/resources/abbreviations_ten_person.txt",
-                "src/test/resources/start_ten_person.log",
-                "src/test/resources/end_ten_person.log"));
+    void chartCombinerShouldReturnCorrectChartForNineteenPerson() {
+        final String expected = readFromFile("src/test/resources/expected.txt");
+        assertEquals(expected, generateResult(""));
     }
 
     @Test
-    void chartCombinerShouldReturnCorrectChartForSixteenPerson() throws EmptyFileException {
-        final String expected = "1.Sebastian Vettel     |FERRARI                    |1:04.415\n" +
-                "2.Daniel Ricciardo     |RED BULL RACING TAG HEUER  |1:12.013\n" +
-                "3.Valtteri Bottas      |MERCEDES                   |1:12.434\n" +
-                "4.Lewis Hamilton       |MERCEDES                   |1:12.460\n" +
-                "5.Stoffel Vandoorne    |MCLAREN RENAULT            |1:12.463\n" +
-                "6.Kimi Raikkonen       |FERRARI                    |1:12.639\n" +
-                "7.Fernando Alonso      |MCLAREN RENAULT            |1:12.657\n" +
-                "8.Sergey Sirotkin      |WILLIAMS MERCEDES          |1:12.706\n" +
-                "9.Charles Leclerc      |SAUBER FERRARI             |1:12.829\n" +
-                "10.Sergio Perez        |FORCE INDIA MERCEDES       |1:12.848\n" +
-                "11.Romain Grosjean     |HAAS FERRARI               |1:12.930\n" +
-                "12.Pierre Gasly        |SCUDERIA TORO ROSSO HONDA  |1:12.941\n" +
-                "13.Carlos Sainz        |RENAULT                    |1:12.950\n" +
-                "14.Esteban Ocon        |FORCE INDIA MERCEDES       |1:13.028\n" +
-                "15.Nico Hulkenberg     |RENAULT                    |1:13.065\n" +
-                "____________________________________________________________\n" +
-                "16.Brendon Hartley     |SCUDERIA TORO ROSSO HONDA  |1:13.179";
-        assertEquals(expected, combiner.outputChart("src/test/resources/abbreviations_sixteen_person.txt",
-                "src/test/resources/start_sixteen_person.log",
-                "src/test/resources/end_sixteen_person.log"));
+    void chartCombinerShouldReturnCorrectChartForOnePerson() {
+        final String expected = readFromFile("src/test/resources/one.person/expected.txt");
+        assertEquals(expected, generateResult("one.person"));
+    }
+
+    @Test
+    void chartCombinerShouldReturnCorrectChartForTenPerson() {
+        final String expected = readFromFile("src/test/resources/ten.person/expected.txt");
+        assertEquals(expected, generateResult("ten.person"));
+    }
+
+    @Test
+    void chartCombinerShouldReturnCorrectChartForSixteenPerson() {
+        final String expected = readFromFile("src/test/resources/sixteen.person/expected.txt");
+        assertEquals(expected, generateResult("sixteen.person"));
+    }
+
+    private String generateResult(String rootPackage) {
+        return combiner.outputChart("src/test/resources/" + rootPackage + "/abbreviations.txt",
+                "src/test/resources/" + rootPackage + "/start.log",
+                "src/test/resources/" + rootPackage + "/end.log");
+    }
+
+    private String readFromFile(String path) {
+        StringBuilder output = new StringBuilder();
+        try (Stream<String> lines = Files.lines(Paths.get(path))) {
+            lines.forEach((p) -> output.append(p).append("\n"));
+            return output.toString().trim();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
