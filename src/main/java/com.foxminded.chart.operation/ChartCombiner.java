@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -34,7 +35,7 @@ public class ChartCombiner {
         return formOutputData(sortChart(abbreviationToChartLine));
     }
 
-    private String formOutputData(Map<String, ChartLine> abbreviationToCharLine) {
+    private static String formOutputData(Map<String, ChartLine> abbreviationToCharLine) {
         AtomicInteger counter = new AtomicInteger(1);
         StringBuilder output = new StringBuilder();
         abbreviationToCharLine.forEach((key, value) -> formOutputChartLine(counter, output, value));
@@ -42,12 +43,12 @@ public class ChartCombiner {
         return output.toString().trim();
     }
 
-    private void formOutputChartLine(AtomicInteger counter, StringBuilder output, ChartLine value) {
-        output.append(String.format("%-23s", combineFirstColumn(counter, value)))
+    private static void formOutputChartLine(AtomicInteger counter, StringBuilder output, ChartLine chartLine) {
+        output.append(String.format("%-23s", combineFirstColumn(counter, chartLine)))
                 .append(VERTICAL_BAR)
-                .append(String.format("%-27s", value.getTeam()))
+                .append(String.format("%-27s", chartLine.getTeam()))
                 .append(VERTICAL_BAR)
-                .append(TimeParser.getLapTime(value))
+                .append(TimeParser.getLapTime(chartLine))
                 .append("\n");
         counter.getAndIncrement();
         if (counter.get() == 16) {
@@ -55,7 +56,7 @@ public class ChartCombiner {
         }
     }
 
-    private StringBuilder combineFirstColumn(AtomicInteger counter, ChartLine value) {
+    private static StringBuilder combineFirstColumn(AtomicInteger counter, ChartLine value) {
         return new StringBuilder()
                 .append(counter.get())
                 .append('.')
@@ -83,18 +84,17 @@ public class ChartCombiner {
         }
     }
 
-    private Map<String, ChartLine> sortChart(Map<String, ChartLine> abbreviationToChartLine) {
-        return abbreviationToChartLine.entrySet()
-                .stream()
+    private static Map<String, ChartLine> sortChart(Map<String, ChartLine> abbreviationToChartLine) {
+        return abbreviationToChartLine.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) ->
                         e1, LinkedHashMap::new));
     }
 
-    private Map<String, ChartLine> combineChart(String filenameAbbrevation,
+    private static Map<String, ChartLine> combineChart(String filenameAbbreviation,
                                                 String filenameStart, String filenameEnd) {
 
-        final Map<String, String> abbreviationToNames = extractDataTextFromFile(filenameAbbrevation);
+        final Map<String, String> abbreviationToNames = extractDataTextFromFile(filenameAbbreviation);
         final Map<String, LocalDateTime> abbreviationToStartTime = extractDataTimeFromFile(filenameStart);
         final Map<String, LocalDateTime> abbreviationToEndTime = extractDataTimeFromFile(filenameEnd);
 
@@ -114,7 +114,7 @@ public class ChartCombiner {
         return abbreviationToChartLine;
     }
 
-    private List<String> readFromFile(String path) {
+    private static List<String> readFromFile(String path) {
         try (Stream<String> lines = Files.lines(Paths.get(path))) {
             return lines.collect(Collectors.toList());
         } catch (IOException e) {
@@ -124,14 +124,20 @@ public class ChartCombiner {
     }
 
     //naming?
-    private Map<String, String> extractDataTextFromFile(String path) {
+    private static Map<String, String> extractDataTextFromFile(String path) {
         return readFromFile(path).stream().collect(Collectors.toMap((p) -> p.substring(0, 3),
                 (p) -> p.substring(4)));
     }
 
-    private Map<String, LocalDateTime> extractDataTimeFromFile(String path) {
+    private static Map<String, LocalDateTime> extractDataTimeFromFile(String path) {
         return readFromFile(path).stream().collect(Collectors.toMap((p) -> p.substring(0, 3),
                 (p) -> TimeParser.parseTime(p.substring(3))));
     }
+
+    private static <T> Map<String, T> groupIntoMapAbbreviationToGeneric(String fileName,
+                                                                        Function<String, T> function) {
+
+    }
+
 }
 
