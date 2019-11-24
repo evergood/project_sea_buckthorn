@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,6 +24,9 @@ public class ChartCombiner {
     private static final String UNDERSCORE = "_";
     private static final String VERTICAL_BAR = "|";
     private static final String SEPARATOR = "------------------------------------------------------------";
+    private static final UnaryOperator<String> extractDataTextFromFile = a -> a.substring(4);
+    private static final Function<String, LocalDateTime> extractDataTimeFromFile = a ->
+            TimeParser.parseTime(a.substring(3));
 
     public String outputChart(String filenameAbbreviation,
                               String filenameStart, String filenameEnd) {
@@ -92,11 +96,14 @@ public class ChartCombiner {
     }
 
     private static Map<String, ChartLine> combineChart(String filenameAbbreviation,
-                                                String filenameStart, String filenameEnd) {
+                                                       String filenameStart, String filenameEnd) {
 
-        final Map<String, String> abbreviationToNames = extractDataTextFromFile(filenameAbbreviation);
-        final Map<String, LocalDateTime> abbreviationToStartTime = extractDataTimeFromFile(filenameStart);
-        final Map<String, LocalDateTime> abbreviationToEndTime = extractDataTimeFromFile(filenameEnd);
+        final Map<String, String> abbreviationToNames = groupIntoMapAbbreviationToGeneric(filenameAbbreviation,
+                extractDataTextFromFile);
+        final Map<String, LocalDateTime> abbreviationToStartTime = groupIntoMapAbbreviationToGeneric(filenameStart,
+                extractDataTimeFromFile);
+        final Map<String, LocalDateTime> abbreviationToEndTime = groupIntoMapAbbreviationToGeneric(filenameEnd,
+                extractDataTimeFromFile);
 
         Map<String, ChartLine> abbreviationToChartLine = new HashMap<>();
         abbreviationToNames.forEach((k, v) -> {
@@ -123,21 +130,9 @@ public class ChartCombiner {
         }
     }
 
-    //naming?
-    private static Map<String, String> extractDataTextFromFile(String path) {
-        return readFromFile(path).stream().collect(Collectors.toMap((p) -> p.substring(0, 3),
-                (p) -> p.substring(4)));
-    }
-
-    private static Map<String, LocalDateTime> extractDataTimeFromFile(String path) {
-        return readFromFile(path).stream().collect(Collectors.toMap((p) -> p.substring(0, 3),
-                (p) -> TimeParser.parseTime(p.substring(3))));
-    }
-
-    private static <T> Map<String, T> groupIntoMapAbbreviationToGeneric(String fileName,
+    private static <T> Map<String, T> groupIntoMapAbbreviationToGeneric(String path,
                                                                         Function<String, T> function) {
-
+        return readFromFile(path).stream().collect(Collectors.toMap((p) -> p.substring(0, 3), function));
     }
-
 }
 
