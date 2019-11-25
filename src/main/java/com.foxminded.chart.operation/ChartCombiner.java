@@ -24,8 +24,8 @@ public class ChartCombiner {
     private static final String UNDERSCORE = "_";
     private static final String VERTICAL_BAR = "|";
     private static final String SEPARATOR = "------------------------------------------------------------";
-    private static final UnaryOperator<String> PARSE_NAME = a -> a.substring(4);
-    private static final Function<String, LocalDateTime> PARSE_TIME = a ->
+    private static final UnaryOperator<String> NAME_PARSER = a -> a.substring(4);
+    private static final Function<String, LocalDateTime> TIME_PARSER = a ->
             TimeParser.parseTime(a.substring(3));
 
     public String outputChart(String filenameAbbreviation,
@@ -99,11 +99,11 @@ public class ChartCombiner {
                                                        String filenameStart, String filenameEnd) {
 
         final Map<String, String> abbreviationToNames = groupIntoMapAbbreviationToGeneric(filenameAbbreviation,
-                PARSE_NAME);
+                NAME_PARSER);
         final Map<String, LocalDateTime> abbreviationToStartTime = groupIntoMapAbbreviationToGeneric(filenameStart,
-                PARSE_TIME);
+                TIME_PARSER);
         final Map<String, LocalDateTime> abbreviationToEndTime = groupIntoMapAbbreviationToGeneric(filenameEnd,
-                PARSE_TIME);
+                TIME_PARSER);
 
         Map<String, ChartLine> abbreviationToChartLine = new HashMap<>();
         abbreviationToNames.forEach((k, v) -> {
