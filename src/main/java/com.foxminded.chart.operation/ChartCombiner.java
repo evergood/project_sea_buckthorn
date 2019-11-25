@@ -24,8 +24,8 @@ public class ChartCombiner {
     private static final String UNDERSCORE = "_";
     private static final String VERTICAL_BAR = "|";
     private static final String SEPARATOR = "------------------------------------------------------------";
-    private static final UnaryOperator<String> extractDataTextFromFile = a -> a.substring(4);
-    private static final Function<String, LocalDateTime> extractDataTimeFromFile = a ->
+    private static final UnaryOperator<String> PARSE_NAME = a -> a.substring(4);
+    private static final Function<String, LocalDateTime> PARSE_TIME = a ->
             TimeParser.parseTime(a.substring(3));
 
     public String outputChart(String filenameAbbreviation,
@@ -60,11 +60,11 @@ public class ChartCombiner {
         }
     }
 
-    private static StringBuilder combineFirstColumn(AtomicInteger counter, ChartLine value) {
+    private static StringBuilder combineFirstColumn(AtomicInteger counter, ChartLine chartLine) {
         return new StringBuilder()
                 .append(counter.get())
                 .append('.')
-                .append(value.getName());
+                .append(chartLine.getName());
     }
 
     private static void validate(String filename, String variableName) {
@@ -99,11 +99,11 @@ public class ChartCombiner {
                                                        String filenameStart, String filenameEnd) {
 
         final Map<String, String> abbreviationToNames = groupIntoMapAbbreviationToGeneric(filenameAbbreviation,
-                extractDataTextFromFile);
+                PARSE_NAME);
         final Map<String, LocalDateTime> abbreviationToStartTime = groupIntoMapAbbreviationToGeneric(filenameStart,
-                extractDataTimeFromFile);
+                PARSE_TIME);
         final Map<String, LocalDateTime> abbreviationToEndTime = groupIntoMapAbbreviationToGeneric(filenameEnd,
-                extractDataTimeFromFile);
+                PARSE_TIME);
 
         Map<String, ChartLine> abbreviationToChartLine = new HashMap<>();
         abbreviationToNames.forEach((k, v) -> {
@@ -131,8 +131,8 @@ public class ChartCombiner {
     }
 
     private static <T> Map<String, T> groupIntoMapAbbreviationToGeneric(String path,
-                                                                        Function<String, T> function) {
-        return readFromFile(path).stream().collect(Collectors.toMap((p) -> p.substring(0, 3), function));
+                                                                        Function<String, T> parser) {
+        return readFromFile(path).stream().collect(Collectors.toMap((p) -> p.substring(0, 3), parser));
     }
 }
 
