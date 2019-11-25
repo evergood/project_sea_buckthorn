@@ -1,0 +1,10 @@
+1.Sebastian Vettel     |FERRARI                    |1:04.415
+2.Daniel Ricciardo     |RED BULL RACING TAG HEUER  |1:12.013
+3.Valtteri Bottas      |MERCEDES                   |1:12.434
+4.Lewis Hamilton       |MERCEDES                   |1:12.460
+5.Kimi Raikkonen       |FERRARI                    |1:12.639
+6.Fernando Alonso      |MCLAREN RENAULT            |1:12.657
+7.Sergio Perez         |FORCE INDIA MERCEDES       |1:12.848
+8.Pierre Gasly         |SCUDERIA TORO ROSSO HONDA  |1:12.941
+9.Carlos Sainz         |RENAULT                    |1:12.950
+10.Esteban Ocon        |FORCE INDIA MERCEDES       |1:13.028
